@@ -13,6 +13,7 @@
       console.log("Voiceframe loaded");
 
       window.addEventListener("message", (event) => {
+        console.log("Voiceframe received message:", event.data);
         if (event.data.type === "voice-start") {
           startRecognition();
         }
