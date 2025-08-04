@@ -12,10 +12,12 @@
     <script>
       console.log("Voiceframe loaded");
 
-      window.addEventListener("message", (event) => {
-        console.log("Message received in iframe:", event.data);
-        if (event.data.type === "voice-start") {
-          startRecognition();
+      window.addEventListener('message', function(event) {
+        const data = event.data;
+        console.log('Message received in iframe:', data);
+      
+        if (data && data.type === 'start-voice') {
+          startDictation();
         }
       });
 
