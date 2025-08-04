@@ -1,61 +1,53 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Voice Assistant</title>
-  </head>
-  <body>
-    <script>
-      window.addEventListener('message', (event) => {
-        if (event.data?.type === 'start-voice') {
-          startVoiceRecognition();
-        }
-      });
-
-      function startVoiceRecognition() {
-        if (!('webkitSpeechRecognition' in window)) {
-          window.parent.postMessage(
-            {
-              type: 'voice-error',
-              message: 'Browser does not support webkitSpeechRecognition.',
-            },
-            '*'
-          );
-          return;
-        }
-
-        const recognition = new webkitSpeechRecognition();
-        recognition.lang = 'en-US';
-        recognition.continuous = false;
-        recognition.interimResults = false;
-
-        recognition.onresult = function (event) {
-          const transcript = event.results[0][0].transcript;
-          window.parent.postMessage(
-            {
-              type: 'voice-result',
-              transcript,
-            },
-            '*'
-          );
-        };
-
-        recognition.onerror = function (event) {
-          window.parent.postMessage(
-            {
-              type: 'voice-error',
-              message: event.error,
-            },
-            '*'
-          );
-        };
-
-        recognition.onend = function () {
-          window.parent.postMessage({ type: 'voice-end' }, '*');
-        };
-
-        recognition.start();
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Voiceframe Assistant</title>
+</head>
+<body>
+  <script>
+    window.addEventListener("message", (event) => {
+      if (event.data.type === "voice-start") {
+        startRecognition();
       }
-    </script>
-  </body>
+    });
+
+    function startRecognition() {
+      if (!("webkitSpeechRecognition" in window)) {
+        window.parent.postMessage({
+          type: "voice-error",
+          message: "Browser does not support webkitSpeechRecognition."
+        }, "*");
+        return;
+      }
+
+      const recognition = new webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = "en-US";
+
+      recognition.onresult = function (event) {
+        const transcript = event.results[0][0].transcript;
+        window.parent.postMessage({
+          type: "voice-result",
+          transcript
+        }, "*");
+      };
+
+      recognition.onerror = function (event) {
+        window.parent.postMessage({
+          type: "voice-error",
+          message: event.error
+        }, "*");
+      };
+
+      recognition.onend = function () {
+        window.parent.postMessage({ type: "voice-end" }, "*");
+      };
+
+      recognition.start();
+    }
+  </script>
+</body>
 </html>
+
