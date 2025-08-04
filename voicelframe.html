@@ -20,49 +20,56 @@
       });
 
       function startRecognition() {
-        if (!("webkitSpeechRecognition" in window)) {
-          window.parent.postMessage(
-            {
-              type: "voice-error",
-              message: "Browser does not support webkitSpeechRecognition.",
-            },
-            "*"
-          );
-          return;
-        }
+  if (!("webkitSpeechRecognition" in window)) {
+    window.parent.postMessage(
+      {
+        type: "voice-error",
+        message: "Browser does not support webkitSpeechRecognition.",
+      },
+      "*"
+    );
+    return;
+  }
 
-        const recognition = new webkitSpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = "en-US";
+  const recognition = new webkitSpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = "en-US";
 
-        recognition.onresult = function (event) {
-          const transcript = event.results[0][0].transcript;
-          window.parent.postMessage(
-            {
-              type: "voice-result",
-              transcript,
-            },
-            "*"
-          );
-        };
+  recognition.onresult = function (event) {
+    const transcript = event.results[0][0].transcript;
 
-        recognition.onerror = function (event) {
-          window.parent.postMessage(
-            {
-              type: "voice-error",
-              message: event.error,
-            },
-            "*"
-          );
-        };
+    console.log("Transcript captured:", transcript);
 
-        recognition.onend = function () {
-          window.parent.postMessage({ type: "voice-end" }, "*");
-        };
+    // ✅ Send transcript back to parent
+    window.parent.postMessage(
+      {
+        type: "voice-result",
+        transcript: transcript,
+      },
+      "*"
+    );
+  };
 
-        recognition.start();
-      }
+  recognition.onerror = function (event) {
+    console.error("Recognition error:", event.error);
+
+    window.parent.postMessage(
+      {
+        type: "voice-error",
+        message: "Speech recognition error: " + event.error,
+      },
+      "*"
+    );
+  };
+
+  recognition.onend = function () {
+    console.log("Recognition ended.");
+    window.parent.postMessage({ type: "voice-end" }, "*");
+  };
+
+  recognition.start();
+}
     </script>
   </body>
 </html>
